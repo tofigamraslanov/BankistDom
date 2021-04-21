@@ -42,7 +42,6 @@ btnScrollTo.addEventListener("click", () =>
 document.querySelector(".nav__links").addEventListener("click", function (e) {
   e.preventDefault();
 
-  // Matching strategy
   if (e.target.classList.contains("nav__link")) {
     const id = e.target.getAttribute("href");
     document.querySelector(id).scrollIntoView({ behavior: "smooth" });
@@ -59,6 +58,7 @@ tabsContainer.addEventListener("click", function (e) {
   tabsContent.forEach((c) => c.classList.remove("operations__content--active"));
 
   clicked.classList.add("operations__tab--active");
+
   document
     .querySelector(`.operations__content--${clicked.dataset.tab}`)
     .classList.add("operations__content--active");
@@ -84,13 +84,11 @@ nav.addEventListener("mouseout", handleHover.bind(1));
 // Sticky navigation
 const header = document.querySelector(".header");
 const navHeight = nav.getBoundingClientRect().height;
-
 const stickyNav = function (entries) {
   const [entry] = entries;
   if (!entry.isIntersecting) nav.classList.add("sticky");
   else nav.classList.remove("sticky");
 };
-
 const headerObserver = new IntersectionObserver(stickyNav, {
   root: null,
   threshold: 0,
@@ -100,9 +98,12 @@ headerObserver.observe(header);
 
 // Reveal sections
 const allSections = document.querySelectorAll(".section");
+
 const revealSection = function (entries, observer) {
   const [entry] = entries;
+
   if (!entry.isIntersecting) return;
+
   entry.target.classList.remove("section--hidden");
   observer.unobserve(entry.target);
 };
@@ -136,3 +137,111 @@ toTopObserver.observe(header);
 toTopImg.addEventListener("click", () => {
   header.scrollIntoView({ behavior: "smooth" });
 });
+
+// Lazy loading images
+const imgTargets = document.querySelectorAll("img[data-src]");
+
+const loadImg = function (entries, observer) {
+  const [entry] = entries;
+
+  if (!entry.isIntersecting) return;
+
+  entry.target.src = entry.target.dataset.src;
+
+  entry.target.addEventListener("load", function () {
+    entry.target.classList.remove("lazy-img");
+  });
+
+  observer.unobserve(entry.target);
+};
+
+const imgObserver = new IntersectionObserver(loadImg, {
+  root: null,
+  threshold: 0,
+  rootMargin: "200px",
+});
+
+imgTargets.forEach((img) => imgObserver.observe(img));
+
+// Slider Component
+const slider = function () {
+  const slides = document.querySelectorAll(".slide");
+  const btnLeft = document.querySelector(".slider__btn--left");
+  const btnRight = document.querySelector(".slider__btn--right");
+  const btnSlider = document.querySelectorAll(".slider__btn");
+  const dotContainer = document.querySelector(".dots");
+
+  let currentSlide = 0;
+  const maxSlide = slides.length;
+
+  // Functions
+  const createDots = function () {
+    slides.forEach((_, i) => {
+      dotContainer.insertAdjacentHTML(
+        "beforeend",
+        `<button class="dots__dot" data-slide='${i}'></button>`
+      );
+    });
+  };
+
+  const activateDot = function (slide) {
+    document
+      .querySelectorAll(".dots__dot")
+      .forEach((dot) => dot.classList.remove("dots__dot--active"));
+
+    document
+      .querySelector(`.dots__dot[data-slide="${slide}"]`)
+      .classList.add("dots__dot--active");
+  };
+
+  const goToSlide = function (slide) {
+    slides.forEach(
+      (s, i) => (s.style.transform = `translateX(${100 * (i - slide)}%)`)
+    );
+  };
+
+  const nextSlide = function () {
+    if (currentSlide === maxSlide - 1) {
+      currentSlide = 0;
+    } else {
+      currentSlide++;
+    }
+    goToSlide(currentSlide);
+    activateDot(currentSlide);
+  };
+
+  const previousSlide = function () {
+    if (currentSlide === 0) {
+      currentSlide = maxSlide - 1;
+    } else {
+      currentSlide--;
+    }
+    goToSlide(currentSlide);
+    activateDot(currentSlide);
+  };
+
+  const init = function (options) {
+    goToSlide(0);
+    createDots();
+    activateDot(0);
+  };
+  init();
+
+  // Event handlers
+  btnRight.addEventListener("click", nextSlide);
+  btnLeft.addEventListener("click", previousSlide);
+
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "ArrowLeft") previousSlide();
+    e.key === "ArrowRight" && nextSlide();
+  });
+
+  dotContainer.addEventListener("click", function (e) {
+    if (e.target.classList.contains("dots__dot")) {
+      const { slide } = e.target.dataset;
+      goToSlide(slide);
+      activateDot(currentSlide);
+    }
+  });
+};
+slider();
