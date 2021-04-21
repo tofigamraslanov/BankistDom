@@ -168,7 +168,6 @@ const slider = function () {
   const slides = document.querySelectorAll(".slide");
   const btnLeft = document.querySelector(".slider__btn--left");
   const btnRight = document.querySelector(".slider__btn--right");
-  const btnSlider = document.querySelectorAll(".slider__btn");
   const dotContainer = document.querySelector(".dots");
 
   let currentSlide = 0;
@@ -220,7 +219,7 @@ const slider = function () {
     activateDot(currentSlide);
   };
 
-  const init = function (options) {
+  const init = function () {
     goToSlide(0);
     createDots();
     activateDot(0);
