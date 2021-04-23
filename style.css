@@ -701,6 +701,7 @@ h4 {
     background: var(--color-primary-darker);
     transform: translateY(-0.3rem);
     border-radius: 50%;
+    cursor: pointer;
 }
 
 .to-top--show {
@@ -715,8 +716,4 @@ h4 {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-}
-
-.to-top__img:hover {
-    cursor: pointer;
 }

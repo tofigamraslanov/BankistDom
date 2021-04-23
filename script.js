@@ -120,7 +120,7 @@ allSections.forEach(function (section) {
 
 // Scroll to Top
 const toTop = document.querySelector(".to-top");
-const toTopImg = document.querySelector(".to-top__img");
+
 const backToTop = function (entries) {
   const [entry] = entries;
   if (entry.isIntersecting) toTop.classList.remove("to-top--show");
@@ -134,7 +134,7 @@ const toTopObserver = new IntersectionObserver(backToTop, {
 });
 toTopObserver.observe(header);
 
-toTopImg.addEventListener("click", () => {
+toTop.addEventListener("click", () => {
   header.scrollIntoView({ behavior: "smooth" });
 });
 
@@ -160,7 +160,6 @@ const imgObserver = new IntersectionObserver(loadImg, {
   threshold: 0,
   rootMargin: "200px",
 });
-
 imgTargets.forEach((img) => imgObserver.observe(img));
 
 // Slider Component
@@ -168,8 +167,10 @@ const slider = function () {
   const slides = document.querySelectorAll(".slide");
   const btnLeft = document.querySelector(".slider__btn--left");
   const btnRight = document.querySelector(".slider__btn--right");
+  const btnSlider = document.querySelectorAll(".slider__btn");
   const dotContainer = document.querySelector(".dots");
 
+  let interval;
   let currentSlide = 0;
   const maxSlide = slides.length;
 
@@ -219,10 +220,15 @@ const slider = function () {
     activateDot(currentSlide);
   };
 
+  const autoNext = function () {
+    interval = setInterval(() => nextSlide(), 5000);
+  };
+
   const init = function () {
     goToSlide(0);
     createDots();
     activateDot(0);
+    autoNext();
   };
   init();
 
@@ -242,5 +248,16 @@ const slider = function () {
       activateDot(currentSlide);
     }
   });
+
+  btnSlider.forEach((b) =>
+    b.addEventListener("mouseenter", () => clearInterval(interval))
+  );
+
+  btnSlider.forEach((b) =>
+    b.addEventListener("mouseleave", function () {
+      nextSlide();
+      autoNext();
+    })
+  );
 };
 slider();
